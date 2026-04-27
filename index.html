@@ -4,25 +4,25 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Radiasi Benda Hitam</title>
+  
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
   <style>
     html, body { height: 100%; margin: 0; font-family: 'Outfit', sans-serif; box-sizing: border-box; }
     * { box-sizing: border-box; }
 
     .app-wrapper {
       width: 100%; height: 100%; overflow-y: auto; overflow-x: hidden;
-      background: #0a0e1a;
-      color: #e2e8f0;
+      background: #0a0e1a; color: #e2e8f0;
     }
 
     .glow-card {
       background: rgba(15, 23, 42, 0.8);
       border: 1px solid rgba(99, 102, 241, 0.15);
-      border-radius: 16px;
-      backdrop-filter: blur(12px);
+      border-radius: 16px; backdrop-filter: blur(12px);
     }
 
     .slider-track { -webkit-appearance: none; appearance: none; width: 100%; height: 6px; border-radius: 3px; outline: none; cursor: pointer; }
@@ -42,9 +42,7 @@
     .analogy-card {
       background: linear-gradient(135deg, rgba(99,102,241,0.08), rgba(139,92,246,0.05));
       border: 1px solid rgba(139,92,246,0.2);
-      border-radius: 14px;
-      padding: 16px 20px;
-      transition: all 0.3s;
+      border-radius: 14px; padding: 16px 20px; transition: all 0.3s;
     }
     .analogy-card:hover { border-color: rgba(139,92,246,0.4); }
 
@@ -58,8 +56,7 @@
 
     .object-preview {
       width: 80px; height: 80px; border-radius: 50%;
-      transition: background 0.4s, box-shadow 0.6s;
-      margin: 0 auto;
+      transition: background 0.4s, box-shadow 0.6s; margin: 0 auto;
     }
 
     .peak-badge {
@@ -73,9 +70,7 @@
     @keyframes fadeUp { from { opacity:0; transform: translateY(8px); } to { opacity:1; transform: translateY(0); } }
     .fade-up { animation: fadeUp 0.5s ease forwards; }
 
-    .info-tooltip {
-      position: relative; cursor: help; display: inline-flex; align-items: center;
-    }
+    .info-tooltip { position: relative; cursor: help; display: inline-flex; align-items: center; }
     .info-tooltip .tip-text {
       visibility: hidden; opacity: 0; position: absolute; bottom: calc(100% + 8px); left: 50%;
       transform: translateX(-50%); background: #1e293b; border: 1px solid rgba(99,102,241,0.3);
@@ -88,57 +83,76 @@
  </head>
  <body>
   <div class="app-wrapper" id="app">
-   <div class="max-w-5xl mx-auto px-4 py-6 sm:py-10 w-full"><div class="text-center mb-8 fade-up">
+   <div class="max-w-5xl mx-auto px-4 py-6 sm:py-10 w-full">
+    
+    <div class="text-center mb-8 fade-up">
      <h1 id="mainTitle" class="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-orange-400 via-rose-400 to-indigo-400 bg-clip-text text-transparent leading-tight">Radiasi Benda Hitam</h1>
      <p class="text-slate-400 mt-2 text-sm sm:text-base">Jelajahi bagaimana benda memancarkan cahaya berdasarkan suhunya</p>
-    </div><div class="analogy-card mb-6 fade-up" style="animation-delay:0.1s">
+    </div>
+
+    <div class="analogy-card mb-6 fade-up" style="animation-delay:0.1s">
      <div class="flex items-start gap-3"><span class="text-2xl mt-0.5">🔥</span>
       <div>
        <h3 id="analogyTitle" class="font-semibold text-indigo-300 mb-1 text-sm">Bayangkan Seperti Ini...</h3>
        <p id="analogyText" class="text-slate-400 text-sm leading-relaxed">Bayangkan besi yang dipanaskan di tungku. Awalnya gelap, lalu <strong class="text-red-400">merah membara</strong>, kemudian <strong class="text-orange-300">oranye terang</strong>, dan jika sangat panas menjadi <strong class="text-blue-300">putih kebiruan</strong> — seperti bintang di langit! Grafik di bawah menunjukkan "resep cahaya" yang dipancarkan: warna apa saja dan seberapa terang.</p>
       </div>
      </div>
-    </div><div class="glow-card p-5 mb-5 fade-up" style="animation-delay:0.15s">
+    </div>
+
+    <div class="glow-card p-5 mb-5 fade-up" style="animation-delay:0.15s">
      <div class="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-5 items-start">
-      <div class="space-y-5"><div>
-        <div class="flex items-center justify-between mb-2"><label class="text-sm font-medium text-slate-300 flex items-center gap-2"> 🌡️ Suhu <span class="info-tooltip"> <i data-lucide="info" style="width:14px;height:14px;color:#6366f1"></i> <span class="tip-text">Seperti memutar kompor: makin panas, cahaya bergeser dari merah ke biru dan makin terang</span> </span> </label> <span id="tempValue" class="mono text-sm font-medium text-orange-300">5000 K</span>
-        </div><input type="range" id="tempSlider" class="slider-track temp-slider" min="1000" max="15000" value="5000" step="100">
-        <div class="flex justify-between text-xs text-slate-500 mt-1"><span>🕯️ Lilin</span><span>☀️ Matahari</span><span>⭐ Bintang Panas</span>
+      <div class="space-y-5">
+       <div>
+        <div class="flex items-center justify-between mb-2">
+            <label class="text-sm font-medium text-slate-300 flex items-center gap-2"> 🌡️ Suhu <span class="info-tooltip"> <i data-lucide="info" style="width:14px;height:14px;color:#6366f1"></i> <span class="tip-text">Seperti memutar kompor: makin panas, cahaya bergeser dari merah ke biru dan makin terang</span> </span> </label> 
+            <span id="tempValue" class="mono text-sm font-medium text-orange-300">5000 K</span>
         </div>
-       </div><div>
-        <div class="flex items-center justify-between mb-2"><label class="text-sm font-medium text-slate-300 flex items-center gap-2"> 🔎 Rentang Panjang Gelombang <span class="info-tooltip"> <i data-lucide="info" style="width:14px;height:14px;color:#6366f1"></i> <span class="tip-text">Seperti zoom kamera: perkecil untuk lihat gambaran besar, perbesar untuk lihat detail warna tertentu</span> </span> </label> <span id="waveValue" class="mono text-sm font-medium text-violet-300">0 – 3000 nm</span>
-        </div><input type="range" id="waveSlider" class="slider-track wave-slider" min="500" max="5000" value="3000" step="100">
-        <div class="flex justify-between text-xs text-slate-500 mt-1"><span>Fokus Cahaya Tampak</span><span>Hingga Inframerah</span>
-        </div>
-       </div><div>
-        <div class="flex items-center gap-2 mb-2"><label class="text-sm font-medium text-slate-300">📊 Skala Intensitas</label> <span class="info-tooltip"> <i data-lucide="info" style="width:14px;height:14px;color:#6366f1"></i> <span class="tip-text">Linear = penggaris biasa. Logaritmik = kaca pembesar untuk melihat cahaya yang sangat redup sekaligus yang sangat terang</span> </span>
-        </div>
-        <div class="flex gap-2"><button id="btnLinear" class="mode-btn active" onclick="setScale('linear')">Linear</button> <button id="btnLog" class="mode-btn inactive" onclick="setScale('log')">Logaritmik</button>
-        </div>
+        <input type="range" id="tempSlider" class="slider-track temp-slider" min="1000" max="15000" value="5000" step="100">
+        <div class="flex justify-between text-xs text-slate-500 mt-1"><span>🕯️ Lilin</span><span>☀️ Matahari</span><span>⭐ Bintang Panas</span></div>
        </div>
-      </div><div class="flex flex-col items-center gap-3 min-w-[130px]">
-       <div class="text-xs text-slate-500 font-medium uppercase tracking-wider">
-        Warna Benda
+       
+       <div>
+        <div class="flex items-center justify-between mb-2">
+            <label class="text-sm font-medium text-slate-300 flex items-center gap-2"> 🔎 Rentang Panjang Gelombang <span class="info-tooltip"> <i data-lucide="info" style="width:14px;height:14px;color:#6366f1"></i> <span class="tip-text">Seperti zoom kamera: perkecil untuk lihat gambaran besar, perbesar untuk lihat detail warna tertentu</span> </span> </label> 
+            <span id="waveValue" class="mono text-sm font-medium text-violet-300">0 – 3000 nm</span>
+        </div>
+        <input type="range" id="waveSlider" class="slider-track wave-slider" min="500" max="5000" value="3000" step="100">
+        <div class="flex justify-between text-xs text-slate-500 mt-1"><span>Fokus Cahaya Tampak</span><span>Hingga Inframerah</span></div>
        </div>
-       <div id="objectPreview" class="object-preview"></div>
-       <div id="objectLabel" class="text-xs text-slate-400 text-center mono">
-        ~5000 K
-       </div>
-       <div id="objectAnalogy" class="text-xs text-slate-500 text-center">
-        ☀️ Seperti Matahari
+
+       <div>
+        <div class="flex items-center gap-2 mb-2">
+            <label class="text-sm font-medium text-slate-300">📊 Skala Intensitas</label> 
+            <span class="info-tooltip"> <i data-lucide="info" style="width:14px;height:14px;color:#6366f1"></i> <span class="tip-text">Linear = penggaris biasa. Logaritmik = kaca pembesar untuk melihat cahaya yang sangat redup sekaligus yang sangat terang</span> </span>
+        </div>
+        <div class="flex gap-2">
+            <button id="btnLinear" class="mode-btn active" onclick="setScale('linear')">Linear</button> 
+            <button id="btnLog" class="mode-btn inactive" onclick="setScale('log')">Logaritmik</button>
+        </div>
        </div>
       </div>
+
+      <div class="flex flex-col items-center gap-3 min-w-[130px]">
+       <div class="text-xs text-slate-500 font-medium uppercase tracking-wider">Warna Benda</div>
+       <div id="objectPreview" class="object-preview"></div>
+       <div id="objectLabel" class="text-xs text-slate-400 text-center mono">~5000 K</div>
+       <div id="objectAnalogy" class="text-xs text-slate-500 text-center">☀️ Seperti Matahari</div>
+      </div>
      </div>
-    </div><div class="glow-card p-4 sm:p-5 mb-5 fade-up" style="animation-delay:0.2s">
+    </div>
+
+    <div class="glow-card p-4 sm:p-5 mb-5 fade-up" style="animation-delay:0.2s">
      <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
       <h2 class="text-sm font-semibold text-slate-300">Spektrum Intensitas</h2>
-      <div id="peakBadge" class="peak-badge"><i data-lucide="target" style="width:14px;height:14px"></i> <span id="peakText" class="mono">Puncak: 580 nm</span>
-      </div>
+      <div id="peakBadge" class="peak-badge"><i data-lucide="target" style="width:14px;height:14px"></i> <span id="peakText" class="mono">Puncak: 580 nm</span></div>
      </div>
-     <canvas id="chart" style="width:100%;height:340px;"></canvas><div class="mt-3 flex items-center gap-2"><span class="text-xs text-slate-500">380</span>
+     <canvas id="chart" style="width:100%;height:340px;"></canvas>
+     <div class="mt-3 flex items-center gap-2"><span class="text-xs text-slate-500">380</span>
       <div style="flex:1;height:10px;border-radius:5px;background:linear-gradient(90deg,#8b00ff,#4400ff,#0044ff,#00ccff,#00ff44,#ffff00,#ff8800,#ff0000);"></div><span class="text-xs text-slate-500">780 nm</span> <span class="text-xs text-slate-600 ml-1">← Cahaya tampak →</span>
      </div>
-    </div><div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6 fade-up" style="animation-delay:0.25s">
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6 fade-up" style="animation-delay:0.25s">
      <div class="analogy-card">
       <div class="text-lg mb-1">🎵</div>
       <h4 class="text-sm font-semibold text-indigo-300 mb-1">Analogi Musik</h4>
@@ -155,6 +169,7 @@
       <p class="text-xs text-slate-400 leading-relaxed">Total energi naik sangat cepat: E ∝ T⁴. Dua kali lipat suhu = 16× lebih terang! Itulah mengapa bintang biru jauh lebih terang dari bintang merah.</p>
      </div>
     </div>
+    
     <div class="text-center text-xs text-slate-600 pb-6">
      Visualisasi berdasarkan Hukum Radiasi Planck · B(λ,T) = (2hc²/λ⁵) × 1/(e^(hc/λkT) − 1)
     </div>
@@ -162,25 +177,259 @@
   </div>
 
   <script>
-// --- Constants ---
-const h = 6.626e-34, c = 3e8, k = 1.381e-23;
-let temperature = 5000, waveMax = 3000, scaleMode = 'linear';
-let animTemp = 5000, animWaveMax = 3000;
-let currentData = [];
+    // --- Constants ---
+    const h = 6.626e-34, c = 3e8, k = 1.381e-23;
+    let temperature = 5000, waveMax = 3000, scaleMode = 'linear';
+    let animTemp = 5000, animWaveMax = 3000;
+    let currentData = [];
 
-// --- Planck's Law ---
-function planck(lambdaNm, T) {
-  const lam = lambdaNm * 1e-9;
-  const a = 2 * h * c * c / Math.pow(lam, 5);
-  const exp = (h * c) / (lam * k * T);
-  if (exp > 500) return 0;
-  return a / (Math.exp(exp) - 1);
-}
+    // --- Planck's Law ---
+    function planck(lambdaNm, T) {
+      const lam = lambdaNm * 1e-9;
+      const a = 2 * h * c * c / Math.pow(lam, 5);
+      const exp = (h * c) / (lam * k * T);
+      if (exp > 500) return 0;
+      return a / (Math.exp(exp) - 1);
+    }
 
-// --- Wavelength to RGB ---
-function wavToRGB(nm) {
-  let r=0,g=0,b=0;
-  if(nm>=380&&nm<440){r=-(nm-440)/(440-380);b=1;}
-  else if(nm>=440&&nm<490){g=(nm-440)/(490-440);b=1;}
-  else if(nm>=490&&nm<510){g=1;b=-(nm-510)/(510-490);}
-  else if(
+    // --- Wavelength to RGB ---
+    function wavToRGB(nm) {
+      let r=0,g=0,b=0;
+      if(nm>=380&&nm<440){r=-(nm-440)/(440-380);b=1;}
+      else if(nm>=440&&nm<490){g=(nm-440)/(490-440);b=1;}
+      else if(nm>=490&&nm<510){g=1;b=-(nm-510)/(510-490);}
+      else if(nm>=510&&nm<580){r=(nm-510)/(580-510);g=1;}
+      else if(nm>=580&&nm<645){r=1;g=-(nm-645)/(645-580);}
+      else if(nm>=645&&nm<=780){r=1;}
+      let f=1;
+      if(nm>=380&&nm<420)f=0.3+0.7*(nm-380)/(420-380);
+      else if(nm>700&&nm<=780)f=0.3+0.7*(780-nm)/(780-700);
+      else if(nm<380||nm>780)f=0;
+      return [r*f,g*f,b*f];
+    }
+
+    // --- Blackbody color approximation ---
+    function bbColor(T) {
+      const t=T/100;let r,g,b;
+      if(t<=66){r=255;g=Math.min(255,Math.max(0,99.4708*Math.log(t)-161.1196));}
+      else{r=Math.min(255,Math.max(0,329.698*Math.pow(t-60,-0.1332)));g=Math.min(255,Math.max(0,288.1221*Math.pow(t-60,-0.0755)));}
+      if(t>=66)b=255;
+      else if(t<=19)b=0;
+      else b=Math.min(255,Math.max(0,138.5177*Math.log(t-10)-305.0448));
+      return `rgb(${Math.round(r)},${Math.round(g)},${Math.round(b)})`;
+    }
+
+    function getAnalogy(T) {
+      if(T<1500) return '🕯️ Seperti bara api redup';
+      if(T<2500) return '🕯️ Seperti lilin menyala';
+      if(T<3500) return '💡 Seperti lampu pijar';
+      if(T<4500) return '🌅 Seperti matahari terbit';
+      if(T<6000) return '☀️ Seperti Matahari siang';
+      if(T<8000) return '⭐ Seperti bintang putih';
+      if(T<11000) return '💎 Seperti bintang biru-putih';
+      return '🔵 Seperti bintang biru raksasa';
+    }
+
+    // --- Canvas Drawing ---
+    const canvas = document.getElementById('chart');
+    const ctx = canvas.getContext('2d');
+
+    function resizeCanvas() {
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = rect.width * window.devicePixelRatio;
+      canvas.height = rect.height * window.devicePixelRatio;
+      ctx.setTransform(window.devicePixelRatio, 0, 0, window.devicePixelRatio, 0, 0);
+    }
+
+    function drawChart(T, maxWave) {
+      const W = canvas.getBoundingClientRect().width;
+      const H = canvas.getBoundingClientRect().height;
+      const pad = {l:55, r:15, t:15, b:35};
+      const cw = W-pad.l-pad.r, ch = H-pad.t-pad.b;
+
+      ctx.clearRect(0, 0, W, H);
+
+      // Compute data
+      const steps = Math.min(400, Math.max(150, Math.round(cw)));
+      const data = [];
+      let maxI = 0;
+      for(let i=0;i<=steps;i++){
+        const lam = 10 + (maxWave-10)*(i/steps);
+        const intensity = planck(lam, T);
+        data.push({lam, intensity});
+        if(intensity > maxI) maxI = intensity;
+      }
+      currentData = data;
+
+      if(maxI === 0) maxI = 1;
+      const logMin = scaleMode==='log' ? Math.log10(Math.max(maxI*1e-8, 1e-20)) : 0;
+      const logMax = scaleMode==='log' ? Math.log10(maxI) : maxI;
+
+      function yPos(val) {
+        if(scaleMode==='log') {
+          const lv = Math.log10(Math.max(val, Math.pow(10, logMin)));
+          return pad.t + ch - ((lv - logMin)/(logMax - logMin))*ch;
+        }
+        return pad.t + ch - (val/maxI)*ch;
+      }
+      function xPos(lam) { return pad.l + (lam-10)/(maxWave-10)*cw; }
+
+      // Visible spectrum band
+      const v1 = Math.max(xPos(380), pad.l), v2 = Math.min(xPos(780), pad.l+cw);
+      if(v2 > v1) {
+        const grad = ctx.createLinearGradient(v1,0,v2,0);
+        grad.addColorStop(0,'rgba(139,0,255,0.06)');
+        grad.addColorStop(0.2,'rgba(0,80,255,0.06)');
+        grad.addColorStop(0.4,'rgba(0,255,100,0.06)');
+        grad.addColorStop(0.6,'rgba(255,255,0,0.06)');
+        grad.addColorStop(0.8,'rgba(255,140,0,0.06)');
+        grad.addColorStop(1,'rgba(255,0,0,0.06)');
+        ctx.fillStyle = grad;
+        ctx.fillRect(v1, pad.t, v2-v1, ch);
+      }
+
+      // Grid lines
+      ctx.strokeStyle = 'rgba(100,116,139,0.12)';
+      ctx.lineWidth = 0.5;
+      for(let i=0;i<=5;i++){
+        const y = pad.t + ch*i/5;
+        ctx.beginPath(); ctx.moveTo(pad.l,y); ctx.lineTo(pad.l+cw,y); ctx.stroke();
+      }
+      for(let i=0;i<=5;i++){
+        const x = pad.l + cw*i/5;
+        ctx.beginPath(); ctx.moveTo(x,pad.t); ctx.lineTo(x,pad.t+ch); ctx.stroke();
+      }
+
+      // Curve fill
+      ctx.beginPath();
+      ctx.moveTo(xPos(data[0].lam), pad.t+ch);
+      for(const d of data) ctx.lineTo(xPos(d.lam), yPos(d.intensity));
+      ctx.lineTo(xPos(data[data.length-1].lam), pad.t+ch);
+      ctx.closePath();
+      const fillGrad = ctx.createLinearGradient(pad.l,0,pad.l+cw,0);
+      fillGrad.addColorStop(0,'rgba(139,92,246,0.15)');
+      fillGrad.addColorStop(0.3,'rgba(59,130,246,0.12)');
+      fillGrad.addColorStop(0.6,'rgba(251,191,36,0.1)');
+      fillGrad.addColorStop(1,'rgba(239,68,68,0.08)');
+      ctx.fillStyle = fillGrad;
+      ctx.fill();
+
+      // Colored curve segments
+      ctx.lineWidth = 2.5;
+      for(let i=1;i<data.length;i++){
+        const lam = (data[i-1].lam+data[i].lam)/2;
+        const [r,g,b] = wavToRGB(lam);
+        if(lam>=380 && lam<=780) {
+          ctx.strokeStyle = `rgba(${Math.round(r*255)},${Math.round(g*255)},${Math.round(b*255)},0.95)`;
+        } else {
+          ctx.strokeStyle = lam < 380 ? 'rgba(160,130,255,0.5)' : 'rgba(255,100,80,0.4)';
+        }
+        ctx.beginPath();
+        ctx.moveTo(xPos(data[i-1].lam), yPos(data[i-1].intensity));
+        ctx.lineTo(xPos(data[i].lam), yPos(data[i].intensity));
+        ctx.stroke();
+      }
+
+      // Peak marker
+      const peakLam = 2.898e6 / T;
+      if(peakLam > 10 && peakLam < maxWave) {
+        const px = xPos(peakLam), py = yPos(planck(peakLam, T));
+        ctx.setLineDash([4,4]);
+        ctx.strokeStyle = 'rgba(251,191,36,0.5)';
+        ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(px, pad.t); ctx.lineTo(px, pad.t+ch); ctx.stroke();
+        ctx.setLineDash([]);
+
+        ctx.beginPath(); ctx.arc(px, py, 5, 0, Math.PI*2);
+        ctx.fillStyle = '#fbbf24'; ctx.fill();
+        ctx.strokeStyle = '#0a0e1a'; ctx.lineWidth = 2; ctx.stroke();
+      }
+
+      // Axes labels
+      ctx.fillStyle = '#64748b'; ctx.font = '11px "JetBrains Mono"'; ctx.textAlign = 'center';
+      for(let i=0;i<=5;i++){
+        const lam = Math.round(10 + (maxWave-10)*i/5);
+        ctx.fillText(lam+'', pad.l+cw*i/5, pad.t+ch+20);
+      }
+      ctx.fillText('Panjang Gelombang (nm)', pad.l+cw/2, pad.t+ch+33);
+
+      ctx.textAlign = 'right';
+      for(let i=0;i<=4;i++){
+        const y = pad.t + ch*i/4;
+        let label;
+        if(scaleMode==='log') {
+          const lv = logMax - (logMax-logMin)*i/4;
+          label = '10^'+Math.round(lv);
+        } else {
+          const v = maxI*(1-i/4);
+          if(v>=1e12) label=(v/1e12).toFixed(1)+'T';
+          else if(v>=1e9) label=(v/1e9).toFixed(1)+'G';
+          else if(v>=1e6) label=(v/1e6).toFixed(1)+'M';
+          else label = v.toFixed(0);
+        }
+        ctx.fillText(label, pad.l-5, y+4);
+      }
+
+      ctx.save(); ctx.translate(12, pad.t+ch/2); ctx.rotate(-Math.PI/2);
+      ctx.textAlign = 'center'; ctx.fillStyle = '#64748b'; ctx.font = '10px "JetBrains Mono"';
+      ctx.fillText('Intensitas (W·sr⁻¹·m⁻³)', 0, 0);
+      ctx.restore();
+    }
+
+    // --- UI Updates ---
+    function updateUI() {
+      const T = Math.round(animTemp);
+      const wm = Math.round(animWaveMax);
+
+      document.getElementById('tempValue').textContent = T + ' K';
+      document.getElementById('waveValue').textContent = '0 – ' + wm + ' nm';
+
+      const col = bbColor(T);
+      const preview = document.getElementById('objectPreview');
+      preview.style.background = col;
+      const brightness = Math.min(1, T/4000);
+      preview.style.boxShadow = `0 0 ${20+brightness*40}px ${10+brightness*20}px ${col.replace('rgb','rgba').replace(')',`,${brightness*0.5})`)}`;
+
+      document.getElementById('objectLabel').textContent = '~' + T + ' K';
+      document.getElementById('objectAnalogy').textContent = getAnalogy(T);
+
+      const peakNm = Math.round(2.898e6 / T);
+      document.getElementById('peakText').textContent = 'Puncak: ' + peakNm + ' nm';
+
+      drawChart(T, wm);
+    }
+
+    function setScale(mode) {
+      scaleMode = mode;
+      document.getElementById('btnLinear').className = 'mode-btn ' + (mode==='linear'?'active':'inactive');
+      document.getElementById('btnLog').className = 'mode-btn ' + (mode==='log'?'active':'inactive');
+      updateUI();
+    }
+
+    // --- Smooth animation ---
+    let rafId;
+    function animate() {
+      const ease = 0.12;
+      animTemp += (temperature - animTemp) * ease;
+      animWaveMax += (waveMax - animWaveMax) * ease;
+      if(Math.abs(animTemp-temperature)<1 && Math.abs(animWaveMax-waveMax)<1) {
+        animTemp = temperature; animWaveMax = waveMax;
+        updateUI();
+        return;
+      }
+      updateUI();
+      rafId = requestAnimationFrame(animate);
+    }
+    function startAnim() { cancelAnimationFrame(rafId); rafId = requestAnimationFrame(animate); }
+
+    document.getElementById('tempSlider').addEventListener('input', e => { temperature = +e.target.value; startAnim(); });
+    document.getElementById('waveSlider').addEventListener('input', e => { waveMax = +e.target.value; startAnim(); });
+
+    // --- Init ---
+    window.addEventListener('resize', () => { resizeCanvas(); updateUI(); });
+    resizeCanvas();
+    updateUI();
+    lucide.createIcons();
+  </script>
+ </body>
+</html>
