@@ -1,0 +1,647 @@
+<!doctype html>
+<html lang="id" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Radiasi Benda Hitam</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+  <style>
+html, body { height: 100%; margin: 0; font-family: 'Outfit', sans-serif; }
+* { box-sizing: border-box; }
+
+.app-wrapper {
+  width: 100%; height: 100%; overflow-y: auto; overflow-x: hidden;
+  background: #0a0e1a;
+  color: #e2e8f0;
+}
+
+.glow-card {
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(99, 102, 241, 0.15);
+  border-radius: 16px;
+  backdrop-filter: blur(12px);
+}
+
+.slider-track { -webkit-appearance: none; appearance: none; width: 100%; height: 6px; border-radius: 3px; outline: none; cursor: pointer; }
+.slider-track::-webkit-slider-thumb { -webkit-appearance: none; width: 22px; height: 22px; border-radius: 50%; cursor: pointer; border: 3px solid #0a0e1a; box-shadow: 0 0 10px rgba(99,102,241,0.5); }
+.slider-track::-moz-range-thumb { width: 22px; height: 22px; border-radius: 50%; cursor: pointer; border: 3px solid #0a0e1a; }
+
+.temp-slider::-webkit-slider-thumb { background: linear-gradient(135deg, #f97316, #ef4444, #3b82f6); }
+.temp-slider::-moz-range-thumb { background: linear-gradient(135deg, #f97316, #ef4444, #3b82f6); }
+.wave-slider::-webkit-slider-thumb { background: linear-gradient(135deg, #8b5cf6, #6366f1); }
+.wave-slider::-moz-range-thumb { background: linear-gradient(135deg, #8b5cf6, #6366f1); }
+
+.temp-slider { background: linear-gradient(90deg, #7c2d12, #dc2626, #3b82f6, #60a5fa); }
+.wave-slider { background: linear-gradient(90deg, #4c1d95, #6366f1, #818cf8); }
+
+canvas { image-rendering: auto; }
+
+.analogy-card {
+  background: linear-gradient(135deg, rgba(99,102,241,0.08), rgba(139,92,246,0.05));
+  border: 1px solid rgba(139,92,246,0.2);
+  border-radius: 14px;
+  padding: 16px 20px;
+  transition: all 0.3s;
+}
+.analogy-card:hover { border-color: rgba(139,92,246,0.4); }
+
+.mode-btn {
+  padding: 8px 18px; border-radius: 10px; font-size: 14px; font-weight: 500;
+  cursor: pointer; transition: all 0.25s; border: 1px solid transparent;
+}
+.mode-btn.active { background: rgba(99,102,241,0.25); border-color: rgba(99,102,241,0.5); color: #a5b4fc; }
+.mode-btn.inactive { background: rgba(30,41,59,0.5); color: #64748b; }
+.mode-btn.inactive:hover { color: #94a3b8; background: rgba(30,41,59,0.8); }
+
+.object-preview {
+  width: 80px; height: 80px; border-radius: 50%;
+  transition: background 0.4s, box-shadow 0.6s;
+  margin: 0 auto;
+}
+
+.peak-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(251,191,36,0.1); border: 1px solid rgba(251,191,36,0.25);
+  border-radius: 8px; padding: 6px 12px; font-size: 13px; color: #fbbf24;
+}
+
+.mono { font-family: 'JetBrains Mono', monospace; }
+
+@keyframes fadeUp { from { opacity:0; transform: translateY(8px); } to { opacity:1; transform: translateY(0); } }
+.fade-up { animation: fadeUp 0.5s ease forwards; }
+
+.info-tooltip {
+  position: relative; cursor: help; display: inline-flex; align-items: center;
+}
+.info-tooltip .tip-text {
+  visibility: hidden; opacity: 0; position: absolute; bottom: calc(100% + 8px); left: 50%;
+  transform: translateX(-50%); background: #1e293b; border: 1px solid rgba(99,102,241,0.3);
+  border-radius: 10px; padding: 10px 14px; font-size: 12px; width: 220px;
+  text-align: left; line-height: 1.5; z-index: 50; transition: opacity 0.2s; color: #cbd5e1;
+  pointer-events: none;
+}
+.info-tooltip:hover .tip-text { visibility: visible; opacity: 1; }
+
+/* Style Navigasi Tab */
+.tab-btn {
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #64748b;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s ease;
+}
+.tab-btn.active {
+  color: #818cf8;
+  border-bottom-color: #6366f1;
+}
+.tab-btn:hover:not(.active) {
+  color: #cbd5e1;
+}
+</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+ </head>
+ <body>
+  <div class="app-wrapper" id="app">
+   <div class="max-w-5xl mx-auto px-4 py-6 sm:py-10 w-full">
+    
+    <div class="text-center mb-6 fade-up">
+     <h1 id="mainTitle" class="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-orange-400 via-rose-400 to-indigo-400 bg-clip-text text-transparent leading-tight">Radiasi Benda Hitam</h1>
+     <p class="text-slate-400 mt-2 text-sm sm:text-base">Jelajahi bagaimana benda memancarkan cahaya berdasarkan suhunya</p>
+    </div>
+
+    <div class="flex border-b border-slate-800 mb-6 gap-2 fade-up" style="animation-delay:0.05s">
+     <button id="tabBtn-instructions" onclick="switchTab('instructions')" class="tab-btn active flex items-center gap-2">
+       <i data-lucide="book-open" style="width:16px;height:16px"></i> Petunjuk Penggunaan
+     </button>
+     <button id="tabBtn-simulation" onclick="switchTab('simulation')" class="tab-btn flex items-center gap-2">
+       <i data-lucide="sliders" style="width:16px;height:16px"></i> Simulasi
+     </button>
+     <button id="tabBtn-theory" onclick="switchTab('theory')" class="tab-btn flex items-center gap-2">
+       <i data-lucide="graduation-cap" style="width:16px;height:16px"></i> Teori
+     </button>
+    </div>
+
+    <div id="tabContent-instructions" class="space-y-4 fade-up">
+      <div class="glow-card p-6">
+        <h3 class="text-lg font-semibold text-indigo-300 mb-4 flex items-center gap-2">
+          <i data-lucide="help-circle" class="text-indigo-400" style="width:20px;height:20px"></i> 
+          Cara Menggunakan Simulasi
+        </h3>
+        <p class="text-slate-400 text-sm mb-6 leading-relaxed">
+          Simulasi ini dirancang untuk memvisualisasikan Hukum Radiasi Planck, Hukum Pergeseran Wien, dan total intensitas energi. Ikuti petunjuk eksperimen di bawah ini:
+        </p>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="p-4 bg-slate-900/40 border border-slate-800 rounded-xl space-y-2">
+            <div class="flex items-center gap-2 font-medium text-orange-400 text-sm">
+              <span>🌡️</span> 1. Mengatur Nilai Suhu Benda
+            </div>
+            <p class="text-xs text-slate-400 leading-relaxed">
+              Geser slider <strong>Suhu</strong> untuk memanaskan atau mendinginkan objek (1.000 K hingga 15.000 K). Perhatikan pergeseran warna visual benda bulat dari jingga merah hingga putih kebiruan.
+            </p>
+          </div>
+
+          <div class="p-4 bg-slate-900/40 border border-slate-800 rounded-xl space-y-2">
+            <div class="flex items-center gap-2 font-medium text-violet-400 text-sm">
+              <span>🔎</span> 2. Rentang Panjang Gelombang (Zoom)
+            </div>
+            <p class="text-xs text-slate-400 leading-relaxed">
+              Gunakan slider <strong>Rentang Panjang Gelombang</strong> untuk melakukan *zoom out* pada sumbu horizontal (X) grafik, agar spektrum inframerah panjang tetap terlihat jelas.
+            </p>
+          </div>
+
+          <div class="p-4 bg-slate-900/40 border border-slate-800 rounded-xl space-y-2">
+            <div class="flex items-center gap-2 font-medium text-indigo-400 text-sm">
+              <span>📊</span> 3. Mengubah Skala Sumbu Grafik
+            </div>
+            <p class="text-xs text-slate-400 leading-relaxed">
+              Ganti mode ke <strong>Logaritmik</strong> jika ingin mendeteksi gelombang mikro/ultraviolet yang intensitasnya sangat tipis, atau kembali ke <strong>Linear</strong> untuk melihat kurva proporsional asli.
+            </p>
+          </div>
+
+          <div class="p-4 bg-slate-900/40 border border-slate-800 rounded-xl space-y-2">
+            <div class="flex items-center gap-2 font-medium text-yellow-400 text-sm">
+              <span>🎯</span> 4. Membaca Data Puncak Gelombang
+            </div>
+            <p class="text-xs text-slate-400 leading-relaxed">
+              Garis putus-putus kuning pada grafik menandakan kedudukan panjang gelombang maksimum. Nilai pastinya ditampilkan langsung secara *real-time* pada indikator badge kuning di atas bagan.
+            </p>
+          </div>
+        </div>
+
+        <div class="mt-6 p-4 bg-indigo-950/30 border border-indigo-900/40 rounded-xl flex flex-col sm:flex-row items-center justify-between gap-3">
+          <span class="text-xs text-indigo-300 italic flex items-center gap-2">
+            <i data-lucide="sparkles" style="width:14px;height:14px"></i> Eksperimen siap dilakukan. Silakan beralih langsung ke halaman lab visualisasi.
+          </span>
+          <button onclick="switchTab('simulation')" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-xs text-white font-medium rounded-lg transition-colors whitespace-nowrap">
+            Buka Lab Simulasi &rarr;
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div id="tabContent-simulation" class="hidden space-y-5">
+      <div class="glow-card p-5">
+       <div class="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-5 items-start">
+        <div class="space-y-5"><div>
+          <div class="flex items-center justify-between mb-2"><label class="text-sm font-medium text-slate-300 flex items-center gap-2"> 🌡️ Suhu <span class="info-tooltip"> <i data-lucide="info" style="width:14px;height:14px;color:#6366f1"></i> <span class="tip-text">Makin panas kompor/bintang, energi radiasi naik tajam dan warna bergeser dari merah ke biru keunguan</span> </span> </label> <span id="tempValue" class="mono text-sm font-medium text-orange-300">5000 K</span>
+          </div><input type="range" id="tempSlider" class="slider-track temp-slider" min="1000" max="15000" value="5000" step="100">
+          <div class="flex justify-between text-xs text-slate-500 mt-1"><span>🕯️ Lilin</span><span>☀️ Matahari</span><span>⭐ Bintang Panas</span>
+          </div>
+         </div><div>
+          <div class="flex items-center justify-between mb-2"><label class="text-sm font-medium text-slate-300 flex items-center gap-2"> 🔎 Rentang Panjang Gelombang <span class="info-tooltip"> <i data-lucide="info" style="width:14px;height:14px;color:#6366f1"></i> <span class="tip-text">Geser untuk memperlebar pandangan sumbu X dari cahaya tampak hingga ekor inframerah</span> </span> </label> <span id="waveValue" class="mono text-sm font-medium text-violet-300">0 – 3000 nm</span>
+          </div><input type="range" id="waveSlider" class="slider-track wave-slider" min="500" max="5000" value="3000" step="100">
+          <div class="flex justify-between text-xs text-slate-500 mt-1"><span>Fokus Cahaya Tampak</span><span>Hingga Inframerah</span>
+          </div>
+         </div><div>
+          <div class="flex items-center gap-2 mb-2"><label class="text-sm font-medium text-slate-300">📊 Skala Intensitas</label> <span class="info-tooltip"> <i data-lucide="info" style="width:14px;height:14px;color:#6366f1"></i> <span class="tip-text">Linear = Skala riil mata manusia. Logaritmik = Seperti memakai pembesar untuk melihat intensitas super kecil</span> </span>
+          </div>
+          <div class="flex gap-2"><button id="btnLinear" class="mode-btn active" onclick="setScale('linear')">Linear</button> <button id="btnLog" class="mode-btn inactive" onclick="setScale('log')">Logaritmik</button>
+          </div>
+         </div>
+        </div><div class="flex flex-col items-center gap-3 min-w-[130px]">
+         <div class="text-xs text-slate-500 font-medium uppercase tracking-wider">
+          Warna Benda
+         </div>
+         <div id="objectPreview" class="object-preview"></div>
+         <div id="objectLabel" class="text-xs text-slate-400 text-center mono">
+          ~5000 K
+         </div>
+         <div id="objectAnalogy" class="text-xs text-slate-500 text-center">
+          ☀️ Seperti Matahari
+         </div>
+        </div>
+       </div>
+      </div>
+
+      <div class="glow-card p-4 sm:p-5">
+       <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+        <h2 class="text-sm font-semibold text-slate-300">Spektrum Intensitas</h2>
+        <div id="peakBadge" class="peak-badge"><i data-lucide="target" style="width:14px;height:14px"></i> <span id="peakText" class="mono">Puncak: 580 nm</span>
+        </div>
+       </div>
+       <canvas id="chart" style="width:100%;height:340px;"></canvas><div class="mt-3 flex items-center gap-2"><span class="text-xs text-slate-500">380</span>
+        <div style="flex:1;height:10px;border-radius:5px;background:linear-gradient(90deg,#8b00ff,#4400ff,#0044ff,#00ccff,#00ff44,#ffff00,#ff8800,#ff0000);"></div><span class="text-xs text-slate-500">780 nm</span> <span class="text-xs text-slate-600 ml-1">← Cahaya tampak →</span>
+       </div>
+      </div>
+    </div>
+
+    <div id="tabContent-theory" class="hidden space-y-6">
+      <div class="analogy-card">
+       <div class="flex items-start gap-3"><span class="text-2xl mt-0.5">🔥</span>
+        <div>
+         <h3 id="analogyTitle" class="font-semibold text-indigo-300 mb-1 text-sm">Bayangkan Seperti Ini...</h3>
+         <p id="analogyText" class="text-slate-400 text-sm leading-relaxed">Bayangkan besi yang dipanaskan di tungku. Awalnya gelap, lalu <strong class="text-red-400">merah membara</strong>, kemudian <strong class="text-orange-300">oranye terang</strong>, dan jika sangat panas menjadi <strong class="text-blue-300">putih kebiruan</strong> — seperti bintang di langit! Grafik di bawah menunjukkan "resep cahaya" yang dipancarkan: warna apa saja dan seberapa terang.</p>
+        </div>
+       </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+       <div class="analogy-card">
+        <div class="text-lg mb-1">🎵</div>
+        <h4 class="text-sm font-semibold text-indigo-300 mb-1">Analogi Musik</h4>
+        <p class="text-xs text-slate-400 leading-relaxed">Suhu = volume musik. Panjang gelombang = nada. Benda dingin memainkan nada bass pelan (inframerah). Benda panas memainkan semua nada keras, puncak di nada tinggi (biru)!</p>
+       </div>
+       <div class="analogy-card">
+        <div class="text-lg mb-1">📐</div>
+        <h4 class="text-sm font-semibold text-indigo-300 mb-1">Hukum Wien</h4>
+        <p class="text-xs text-slate-400 leading-relaxed">Puncak kurva bergeser ke kiri (gelombang pendek) saat suhu naik. Rumusnya: λ<sub>maks</sub> = 2.898 × 10⁶ / T. Makin panas, makin biru!</p>
+       </div>
+       <div class="analogy-card">
+        <div class="text-lg mb-1">📈</div>
+        <h4 class="text-sm font-semibold text-indigo-300 mb-1">Hukum Stefan-Boltzmann</h4>
+        <p class="text-xs text-slate-400 leading-relaxed">Total energi naik sangat cepat: E ∝ T⁴. Dua kali lipat suhu = 16× lebih terang! Itulah mengapa bintang biru jauh lebih terang dari bintang merah.</p>
+       </div>
+      </div>
+
+      <div class="text-center text-xs text-slate-600 pt-4">
+       Visualisasi berdasarkan Hukum Radiasi Planck · B(λ,T) = (2hc²/λ⁵) × 1/(e^(hc/λkT) − 1)
+      </div>
+    </div>
+
+   </div>
+  </div>
+
+  <script>
+// --- Constants ---
+const h = 6.626e-34, c = 3e8, k = 1.381e-23;
+let temperature = 5000, waveMax = 3000, scaleMode = 'linear';
+let animTemp = 5000, animWaveMax = 3000;
+let currentData = [];
+
+// --- Tab System ---
+function switchTab(tabId) {
+  const tabs = ['instructions', 'simulation', 'theory'];
+  tabs.forEach(tab => {
+    const contentEl = document.getElementById(`tabContent-${tab}`);
+    const btnEl = document.getElementById(`tabBtn-${tab}`);
+    
+    if (contentEl && btnEl) {
+      if(tab === tabId) {
+        contentEl.classList.remove('hidden');
+        btnEl.classList.add('active');
+      } else {
+        contentEl.classList.add('hidden');
+        btnEl.classList.remove('active');
+      }
+    }
+  });
+
+  if(tabId === 'simulation') {
+    requestAnimationFrame(() => {
+      resizeCanvas();
+      updateUI();
+    });
+  }
+}
+
+// --- Planck's Law ---
+function planck(lambdaNm, T) {
+  const lam = lambdaNm * 1e-9;
+  const a = 2 * h * c * c / Math.pow(lam, 5);
+  const exp = (h * c) / (lam * k * T);
+  if (exp > 500) return 0;
+  return a / (Math.exp(exp) - 1);
+}
+
+// --- Wavelength to RGB ---
+function wavToRGB(nm) {
+  let r=0,g=0,b=0;
+  if(nm>=380&&nm<440){r=-(nm-440)/(440-380);b=1;}
+  else if(nm>=440&&nm<490){g=(nm-440)/(490-440);b=1;}
+  else if(nm>=490&&nm<510){g=1;b=-(nm-510)/(510-490);}
+  else if(nm>=510&&nm<580){r=(nm-510)/(580-510);g=1;}
+  else if(nm>=580&&nm<645){r=1;g=-(nm-645)/(645-580);}
+  else if(nm>=645&&nm<=780){r=1;}
+  let f=1;
+  if(nm>=380&&nm<420)f=0.3+0.7*(nm-380)/(420-380);
+  else if(nm>700&&nm<=780)f=0.3+0.7*(780-nm)/(780-700);
+  else if(nm<380||nm>780)f=0;
+  return [r*f,g*f,b*f];
+}
+
+// --- Blackbody color approximation ---
+function bbColor(T) {
+  const t=T/100;let r,g,b;
+  if(t<=66){r=255;g=Math.min(255,Math.max(0,99.4708*Math.log(t)-161.1196));}
+  else{r=Math.min(255,Math.max(0,329.698*Math.pow(t-60,-0.1332)));g=Math.min(255,Math.max(0,288.1221*Math.pow(t-60,-0.0755)));}
+  if(t>=66)b=255;
+  else if(t<=19)b=0;
+  else b=Math.min(255,Math.max(0,138.5177*Math.log(t-10)-305.0448));
+  return `rgb(${Math.round(r)},${Math.round(g)},${Math.round(b)})`;
+}
+
+function getAnalogy(T) {
+  if(T<1500) return '🕯️ Seperti bara api redup';
+  if(T<2500) return '🕯️ Seperti lilin menyala';
+  if(T<3500) return '💡 Seperti lampu pijar';
+  if(T<4500) return '🌅 Seperti matahari terbit';
+  if(T<6000) return '☀️ Seperti Matahari siang';
+  if(T<8000) return '⭐ Seperti bintang putih';
+  if(T<11000) return '💎 Seperti bintang biru-putih';
+  return '🔵 Seperti bintang biru raksasa';
+}
+
+// --- Canvas Drawing ---
+const canvas = document.getElementById('chart');
+const ctx = canvas.getContext('2d');
+
+function resizeCanvas() {
+  const rect = canvas.getBoundingClientRect();
+  if (rect.width === 0 || rect.height === 0) return;
+  canvas.width = rect.width * window.devicePixelRatio;
+  canvas.height = rect.height * window.devicePixelRatio;
+  ctx.setTransform(window.devicePixelRatio, 0, 0, window.devicePixelRatio, 0, 0);
+}
+
+function drawChart(T, maxWave) {
+  const rect = canvas.getBoundingClientRect();
+  if (rect.width === 0) return;
+
+  const W = rect.width;
+  const H = rect.height;
+  const pad = {l:55, r:15, t:15, b:35};
+  const cw = W-pad.l-pad.r, ch = H-pad.t-pad.b;
+
+  ctx.clearRect(0, 0, W, H);
+
+  const steps = Math.min(400, Math.max(150, Math.round(cw)));
+  const data = [];
+  let maxI = 0;
+  for(let i=0;i<=steps;i++){
+    const lam = 10 + (maxWave-10)*(i/steps);
+    const intensity = planck(lam, T);
+    data.push({lam, intensity});
+    if(intensity > maxI) maxI = intensity;
+  }
+  currentData = data;
+
+  if(maxI === 0) maxI = 1;
+  const logMin = scaleMode==='log' ? Math.log10(Math.max(maxI*1e-8, 1e-20)) : 0;
+  const logMax = scaleMode==='log' ? Math.log10(maxI) : maxI;
+
+  function yPos(val) {
+    if(scaleMode==='log') {
+      const lv = Math.log10(Math.max(val, Math.pow(10, logMin)));
+      return pad.t + ch - ((lv - logMin)/(logMax - logMin))*ch;
+    }
+    return pad.t + ch - (val/maxI)*ch;
+  }
+  function xPos(lam) { return pad.l + (lam-10)/(maxWave-10)*cw; }
+
+  const v1 = Math.max(xPos(380), pad.l), v2 = Math.min(xPos(780), pad.l+cw);
+  if(v2 > v1) {
+    const grad = ctx.createLinearGradient(v1,0,v2,0);
+    grad.addColorStop(0,'rgba(139,0,255,0.06)');
+    grad.addColorStop(0.2,'rgba(0,80,255,0.06)');
+    grad.addColorStop(0.4,'rgba(0,255,100,0.06)');
+    grad.addColorStop(0.6,'rgba(255,255,0,0.06)');
+    grad.addColorStop(0.8,'rgba(255,140,0,0.06)');
+    grad.addColorStop(1,'rgba(255,0,0,0.06)');
+    ctx.fillStyle = grad;
+    ctx.fillRect(v1, pad.t, v2-v1, ch);
+  }
+
+  ctx.strokeStyle = 'rgba(100,116,139,0.12)';
+  ctx.lineWidth = 0.5;
+  for(let i=0;i<=5;i++){
+    const y = pad.t + ch*i/5;
+    ctx.beginPath(); ctx.moveTo(pad.l,y); ctx.lineTo(pad.l+cw,y); ctx.stroke();
+  }
+  for(let i=0;i<=5;i++){
+    const x = pad.l + cw*i/5;
+    ctx.beginPath(); ctx.moveTo(x,pad.t); ctx.lineTo(x,pad.t+ch); ctx.stroke();
+  }
+
+  ctx.beginPath();
+  ctx.moveTo(xPos(data[0].lam), pad.t+ch);
+  for(const d of data) ctx.lineTo(xPos(d.lam), yPos(d.intensity));
+  ctx.lineTo(xPos(data[data.length-1].lam), pad.t+ch);
+  ctx.closePath();
+  const fillGrad = ctx.createLinearGradient(pad.l,0,pad.l+cw,0);
+  fillGrad.addColorStop(0,'rgba(139,92,246,0.15)');
+  fillGrad.addColorStop(0.3,'rgba(59,130,246,0.12)');
+  fillGrad.addColorStop(0.6,'rgba(251,191,36,0.1)');
+  fillGrad.addColorStop(1,'rgba(239,68,68,0.08)');
+  ctx.fillStyle = fillGrad;
+  ctx.fill();
+
+  ctx.lineWidth = 2.5;
+  for(let i=1;i<data.length;i++){
+    const lam = (data[i-1].lam+data[i].lam)/2;
+    const [r,g,b] = wavToRGB(lam);
+    if(lam>=380 && lam<=780) {
+      ctx.strokeStyle = `rgba(${Math.round(r*255)},${Math.round(g*255)},${Math.round(b*255)},0.95)`;
+    } else {
+      ctx.strokeStyle = lam < 380 ? 'rgba(160,130,255,0.5)' : 'rgba(255,100,80,0.4)';
+    }
+    ctx.beginPath();
+    ctx.moveTo(xPos(data[i-1].lam), yPos(data[i-1].intensity));
+    ctx.lineTo(xPos(data[i].lam), yPos(data[i].intensity));
+    ctx.stroke();
+  }
+
+  const peakLam = 2.898e6 / T;
+  if(peakLam > 10 && peakLam < maxWave) {
+    const px = xPos(peakLam), py = yPos(planck(peakLam, T));
+    ctx.setLineDash([4,4]);
+    ctx.strokeStyle = 'rgba(251,191,36,0.5)';
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(px, pad.t); ctx.lineTo(px, pad.t+ch); ctx.stroke();
+    ctx.setLineDash([]);
+
+    ctx.beginPath(); ctx.arc(px, py, 5, 0, Math.PI*2);
+    ctx.fillStyle = '#fbbf24'; ctx.fill();
+    ctx.strokeStyle = '#0a0e1a'; ctx.lineWidth = 2; ctx.stroke();
+  }
+
+  ctx.fillStyle = '#64748b'; ctx.font = '11px "JetBrains Mono"'; ctx.textAlign = 'center';
+  for(let i=0;i<=5;i++){
+    const lam = Math.round(10 + (maxWave-10)*i/5);
+    ctx.fillText(lam+'', pad.l+cw*i/5, pad.t+ch+20);
+  }
+  ctx.fillText('Panjang Gelombang (nm)', pad.l+cw/2, pad.t+ch+33);
+
+  ctx.textAlign = 'right';
+  for(let i=0;i<=4;i++){
+    const y = pad.t + ch*i/4;
+    let label;
+    if(scaleMode==='log') {
+      const lv = logMax - (logMax-logMin)*i/4;
+      label = '10^'+Math.round(lv);
+    } else {
+      const v = maxI*(1-i/4);
+      if(v>=1e12) label=(v/1e12).toFixed(1)+'T';
+      else if(v>=1e9) label=(v/1e9).toFixed(1)+'G';
+      else if(v>=1e6) label=(v/1e6).toFixed(1)+'M';
+      else label = v.toFixed(0);
+    }
+    ctx.fillText(label, pad.l-5, y+4);
+  }
+
+  ctx.save(); ctx.translate(12, pad.t+ch/2); ctx.rotate(-Math.PI/2);
+  ctx.textAlign = 'center'; ctx.fillStyle = '#64748b'; ctx.font = '10px "JetBrains Mono"';
+  ctx.fillText('Intensitas (W·sr⁻¹·m⁻³)', 0, 0);
+  ctx.restore();
+}
+
+// --- UI Updates ---
+function updateUI() {
+  const T = Math.round(animTemp);
+  const wm = Math.round(animWaveMax);
+
+  const tempValEl = document.getElementById('tempValue');
+  const waveValEl = document.getElementById('waveValue');
+  if (tempValEl) tempValEl.textContent = T + ' K';
+  if (waveValEl) waveValEl.textContent = '0 – ' + wm + ' nm';
+
+  const col = bbColor(T);
+  const preview = document.getElementById('objectPreview');
+  if (preview) {
+    preview.style.background = col;
+    const brightness = Math.min(1, T/4000);
+    preview.style.boxShadow = `0 0 ${20+brightness*40}px ${10+brightness*20}px ${col.replace('rgb','rgba').replace(')',`,${brightness*0.5})`)}`;
+  }
+
+  const objLabelEl = document.getElementById('objectLabel');
+  const objAnalogyEl = document.getElementById('objectAnalogy');
+  if (objLabelEl) objLabelEl.textContent = '~' + T + ' K';
+  if (objAnalogyEl) objAnalogyEl.textContent = getAnalogy(T);
+
+  const peakNm = Math.round(2.898e6 / T);
+  const peakTextEl = document.getElementById('peakText');
+  if (peakTextEl) peakTextEl.textContent = 'Puncak: ' + peakNm + ' nm';
+
+  drawChart(T, wm);
+}
+
+function setScale(mode) {
+  scaleMode = mode;
+  document.getElementById('btnLinear').className = 'mode-btn ' + (mode==='linear'?'active':'inactive');
+  document.getElementById('btnLog').className = 'mode-btn ' + (mode==='log'?'active':'inactive');
+  updateUI();
+}
+
+// --- Smooth animation ---
+let rafId;
+function animate() {
+  const ease = 0.12;
+  animTemp += (temperature - animTemp) * ease;
+  animWaveMax += (waveMax - animWaveMax) * ease;
+  if(Math.abs(animTemp-temperature)<1 && Math.abs(animWaveMax-waveMax)<1) {
+    animTemp = temperature; animWaveMax = waveMax;
+    updateUI();
+    return;
+  }
+  updateUI();
+  rafId = requestAnimationFrame(animate);
+}
+function startAnim() { cancelAnimationFrame(rafId); rafId = requestAnimationFrame(animate); }
+
+document.getElementById('tempSlider').addEventListener('input', e => { temperature = +e.target.value; startAnim(); });
+document.getElementById('waveSlider').addEventListener('input', e => { waveMax = +e.target.value; startAnim(); });
+
+// --- Element SDK ---
+const defaultConfig = {
+  main_title: 'Radiasi Benda Hitam',
+  analogy_title: 'Bayangkan Seperti Ini...',
+  background_color: '#0a0e1a',
+  surface_color: '#0f172ae6',
+  text_color: '#e2e8f0',
+  primary_action_color: '#6366f1',
+  secondary_action_color: '#fbbf24',
+  font_family: 'Outfit',
+  font_size: 16
+};
+
+function applyConfig(config) {
+  const t = config.main_title || defaultConfig.main_title;
+  const a = config.analogy_title || defaultConfig.analogy_title;
+  const bg = config.background_color || defaultConfig.background_color;
+  const sf = config.surface_color || defaultConfig.surface_color;
+  const tx = config.text_color || defaultConfig.text_color;
+  const pa = config.primary_action_color || defaultConfig.primary_action_color;
+  const sa = config.secondary_action_color || defaultConfig.secondary_action_color;
+  const ff = config.font_family || defaultConfig.font_family;
+  const fs = config.font_size || defaultConfig.font_size;
+
+  document.getElementById('mainTitle').textContent = t;
+  document.getElementById('analogyTitle').textContent = a;
+
+  const wrapper = document.getElementById('app');
+  wrapper.style.background = bg;
+  wrapper.style.color = tx;
+  wrapper.style.fontFamily = `${ff}, Outfit, sans-serif`;
+
+  document.querySelectorAll('.glow-card').forEach(el => {
+    el.style.background = sf;
+    el.style.borderColor = pa + '26';
+  });
+
+  document.querySelectorAll('.analogy-card').forEach(el => {
+    el.style.borderColor = pa + '33';
+  });
+
+  document.querySelectorAll('.peak-badge').forEach(el => {
+    el.style.color = sa;
+    el.style.borderColor = sa + '40';
+    el.style.background = sa + '1a';
+  });
+
+  document.getElementById('mainTitle').style.fontSize = `${fs * 2}px`;
+  document.querySelectorAll('p, label, span').forEach(el => {
+    if(!el.closest('.peak-badge') && !el.classList.contains('mono') && !el.closest('#tabContent-instructions'))
+      el.style.fontSize = `${fs * 0.875}px`;
+  });
+}
+
+if (window.elementSdk && typeof window.elementSdk.init === 'function') {
+  try {
+    window.elementSdk.init({
+      defaultConfig,
+      onConfigChange: async (config) => applyConfig(config),
+      mapToCapabilities: (config) => ({
+        recolorables: [
+          { get:()=>config.background_color||defaultConfig.background_color, set:(v)=>{config.background_color=v;window.elementSdk.setConfig({background_color:v})} },
+          { get:()=>config.surface_color||defaultConfig.surface_color, set:(v)=>{config.surface_color=v;window.elementSdk.setConfig({surface_color:v})} },
+          { get:()=>config.text_color||defaultConfig.text_color, set:(v)=>{config.text_color=v;window.elementSdk.setConfig({text_color:v})} },
+          { get:()=>config.primary_action_color||defaultConfig.primary_action_color, set:(v)=>{config.primary_action_color=v;window.elementSdk.setConfig({primary_action_color:v})} },
+          { get:()=>config.secondary_action_color||defaultConfig.secondary_action_color, set:(v)=>{config.secondary_action_color=v;window.elementSdk.setConfig({secondary_action_color:v})} },
+        ],
+        borderables: [],
+        fontEditable: { get:()=>config.font_family||defaultConfig.font_family, set:(v)=>{config.font_family=v;window.elementSdk.setConfig({font_family:v})} },
+        fontSizeable: { get:()=>config.font_size||defaultConfig.font_size, set:(v)=>{config.font_size=v;window.elementSdk.setConfig({font_size:v})} },
+      }),
+      mapToEditPanelValues: (config) => new Map([
+        ['main_title', config.main_title || defaultConfig.main_title],
+        ['analogy_title', config.analogy_title || defaultConfig.analogy_title],
+      ])
+    });
+  } catch (e) {
+    console.error("SDK Init Error:", e);
+    applyConfig(defaultConfig);
+  }
+} else {
+  applyConfig(defaultConfig);
+}
+
+// --- Init Pertama Kali ---
+window.addEventListener('resize', () => { resizeCanvas(); updateUI(); });
+resizeCanvas();
+updateUI();
+
+// Pengaman Lucide jika dibuka dalam kondisi offline / lokal komputer
+try {
+  if (window.lucide && typeof window.lucide.createIcons === 'function') {
+    lucide.createIcons();
+  }
+} catch(e) {
+  console.log("Lucide icons skipped offline setup.");
+}
+</script>
+</body>
+</html>
